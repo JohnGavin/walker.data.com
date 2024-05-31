@@ -1,0 +1,177 @@
+---
+params:
+  source_url: "https://walker-data.com/posts/overture-buildings"
+title: "walker.data.com"
+subtitle: "`r params$source_url`"
+---
+# Setup
+```{r library}
+#| warning: false
+#| message: false
+if (!requireNamespace('arrow'))     
+  install.packages('arrow', 
+    repos = 'https://apache.r-universe.dev')
+library(arrow) 
+# first load arrow then, _if_ needed, run install_arrow()
+arrow_info() |> names()
+arrow_info()$capabilities |> sort()
+arrow_info()$build_info$cpp_version
+arrow_info()$build_info$cpp_compiler
+stopifnot(
+    arrow_available()
+  , arrow_with_s3()
+  , arrow_with_parquet()
+  , arrow_with_json()
+  , arrow_with_dataset()
+  , arrow_with_gcs()
+  # arrow_with_acero() , arrow_with_substrait()
+)
+if (!requireNamespace('rdeck')) 
+  pak::pak("qfes/rdeck")
+# remotes::install_github("qfes/rdeck")
+if (!requireNamespace('pacman')) 
+  install.packages("pacman")
+pacman::p_load(
+  sf, dplyr, tigris, rdeck,
+  scales, tictoc, lobstr)
+options(tigris_use_cache = TRUE)
+```
+```{r open_dataset}
+s3_buildings <- 
+  's3://overturemaps-us-west-2/release/2024-05-16-beta.0/theme=buildings?region=us-west-2'
+tic('open_dataset')
+  # database-like connection to the buildings dataset
+  buildings <- open_dataset(s3_buildings)
+toc()
+lobstr::obj_size(buildings)
+```
+```{r nrow(buildings)}
+tic('nrow(buildings)')
+  num_buildings <- nrow(buildings) 
+toc()
+num_buildings |> prettyNum(big.mark = ',')
+num_buildings |> 
+  scales::label_number(accuracy=0.1, 
+    scale_cut=scales::cut_short_scale())(x = _)
+```
+## London
++ Wide {{bbox|-0.489|51.28|0.236|51.686}}
++ https://www.openstreetmap.org/export#map=15/51.5150/-0.0912
+  + ldn_bb <- c(-0.1061, 51.5227, -0.0763, 51.5072)
++ http://bboxfinder.com/#0.000000,0.000000,0.000000,0.000000
+  + -0.120450,51.509507,-0.076247,51.526465
+```{r ldn_bbox}
+ldn_bbox <- c(-0.1061, 51.5227, -0.0763, 51.5072)
+get_buildings <- function(bbox, buildings)
+  buildings |>
+  filter(bbox$xmin > sf_bbox[1],
+         bbox$ymin > sf_bbox[2],
+         bbox$xmax < sf_bbox[3],
+         bbox$ymax < sf_bbox[4]) |>
+  select(id, geometry, height) |> 
+  collect() |>
+  st_as_sf(crs = 4326) |> 
+  mutate(height = ifelse(is.na(height), 8, height))
+ldn_buildings <- 
+  ldn_bbox |> 
+  get_buildings(buildings)
+```
+```{r rdeck Ldn}
+rdeck(map_style = mapbox_light(), 
+      initial_view_state = view_state(
+        center = c(-122.4657, 37.7548),
+        zoom = 11.3,
+        bearing = -60,
+        pitch = 76
+      )) |> 
+  add_polygon_layer(
+    data = ldn_buildings, 
+    name = "London (central)",
+    get_polygon = geometry, 
+    get_elevation = height, 
+    get_fill_color = scale_color_linear(
+      col = height,
+      palette = viridisLite::inferno(100, direction = -1)
+    ),
+    extruded = TRUE, 
+    opacity = 0.5)
+```
+
+
+## SF
+```{r counties}
+#| warning: true
+#| message: false
+sf_bbox <- counties(state = "CA", cb = TRUE, resolution = "20m") |> 
+  filter(NAME == "San Francisco") |> 
+  st_bbox() |> 
+  as.vector()
+sf_buildings <- 
+  sf_bbox |> 
+  get_buildings(buildings)
+sf_buildings_old <- buildings |>
+  filter(bbox$xmin > sf_bbox[1],
+         bbox$ymin > sf_bbox[2],
+         bbox$xmax < sf_bbox[3],
+         bbox$ymax < sf_bbox[4]) |>
+  select(id, geometry, height) |> 
+  collect() |>
+  st_as_sf(crs = 4326) |> 
+  mutate(height = ifelse(is.na(height), 8, height))
+sf_buildings |> identical(sf_buildings_old)
+```
+```{r rdeck SF}
+rdeck(map_style = mapbox_light(), 
+      initial_view_state = view_state(
+        center = c(-122.4657, 37.7548),
+        zoom = 11.3,
+        bearing = -60,
+        pitch = 76
+      )) |> 
+  add_polygon_layer(
+    data = sf_buildings, 
+    name = "San Francisco",
+    get_polygon = geometry, 
+    get_elevation = height, 
+    get_fill_color = scale_color_linear(
+      col = height,
+      palette = viridisLite::inferno(100, direction = -1)
+    ),
+    extruded = TRUE, 
+    opacity = 0.5)
+```
+<!-- ## sydney -->
+<!-- ```{r sydney_bbox} -->
+<!-- sydney_bbox <- c(150.787520, -34.088237, 151.422667, -33.643521) -->
+
+<!-- sydney_buildings <- buildings |> -->
+<!--   filter(bbox$xmin > sydney_bbox[1], -->
+<!--          bbox$ymin > sydney_bbox[2], -->
+<!--          bbox$xmax < sydney_bbox[3], -->
+<!--          bbox$ymax < sydney_bbox[4]) |> -->
+<!--   select(id, geometry, height) |>  -->
+<!--   collect() |> -->
+<!--   st_as_sf(crs = 4326) |>  -->
+<!--   mutate(height = ifelse(is.na(height), 4, height)) -->
+<!-- ``` -->
+<!-- ```{r rdeck sydney} -->
+<!-- rdeck(map_style = mapbox_light(),  -->
+<!--       initial_view_state = view_state( -->
+<!--         center = c(151.186855, -33.871729), -->
+<!--         zoom = 12, -->
+<!--         bearing = -32.8, -->
+<!--         pitch = 81 -->
+<!--       )) |>  -->
+<!--   add_polygon_layer( -->
+<!--     data = sydney_buildings,  -->
+<!--     name = "Sydney", -->
+<!--     get_polygon = geometry,  -->
+<!--     get_elevation = height,  -->
+<!--     get_fill_color = scale_color_linear( -->
+<!--       col = height, -->
+<!--       palette = viridisLite::mako(100, direction = -1) -->
+<!--     ), -->
+<!--     extruded = TRUE,  -->
+<!--     opacity = 0.5) -->
+<!-- ``` -->
+
