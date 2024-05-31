@@ -7,9 +7,9 @@ project:
   #   i.e. specify working dir for rendering files within project
   #   e.g. when running background job in Rstudio
   #   default: working dir is dir of qmd file itself e.g. ./inst/qmd/
-  execute-dir: project
-  resources:
-    - data/*.parquet
+  # execute-dir: project
+  # resources:
+  #   - data/*.parquet
   # output-dir: _output
   # preview:
   #   port: 4200
