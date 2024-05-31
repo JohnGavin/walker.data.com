@@ -235,81 +235,52 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb5-17"><a href="#cb5-17" aria-hidden="true" tabindex="-1"></a>    <span class="at">extruded =</span> <span class="cn">TRUE</span>, </span>
 <span id="cb5-18"><a href="#cb5-18" aria-hidden="true" tabindex="-1"></a>    <span class="at">opacity =</span> <span class="fl">0.5</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-</section>
-<section id="sf" class="level2">
-<h2 class="anchored" data-anchor-id="sf">SF</h2>
-<div class="cell">
-<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>sf_bbox <span class="ot">&lt;-</span> <span class="fu">counties</span>(<span class="at">state =</span> <span class="st">"CA"</span>, <span class="at">cb =</span> <span class="cn">TRUE</span>, <span class="at">resolution =</span> <span class="st">"20m"</span>) <span class="sc">|&gt;</span> </span>
-<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(NAME <span class="sc">==</span> <span class="st">"San Francisco"</span>) <span class="sc">|&gt;</span> </span>
-<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">st_bbox</span>() <span class="sc">|&gt;</span> </span>
-<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">as.vector</span>()</span>
-<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a>sf_buildings <span class="ot">&lt;-</span> </span>
-<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a>  sf_bbox <span class="sc">|&gt;</span> </span>
-<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">get_buildings</span>(buildings)</span>
-<span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a>sf_buildings_old <span class="ot">&lt;-</span> buildings <span class="sc">|&gt;</span></span>
-<span id="cb6-9"><a href="#cb6-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(bbox<span class="sc">$</span>xmin <span class="sc">&gt;</span> sf_bbox[<span class="dv">1</span>],</span>
-<span id="cb6-10"><a href="#cb6-10" aria-hidden="true" tabindex="-1"></a>         bbox<span class="sc">$</span>ymin <span class="sc">&gt;</span> sf_bbox[<span class="dv">2</span>],</span>
-<span id="cb6-11"><a href="#cb6-11" aria-hidden="true" tabindex="-1"></a>         bbox<span class="sc">$</span>xmax <span class="sc">&lt;</span> sf_bbox[<span class="dv">3</span>],</span>
-<span id="cb6-12"><a href="#cb6-12" aria-hidden="true" tabindex="-1"></a>         bbox<span class="sc">$</span>ymax <span class="sc">&lt;</span> sf_bbox[<span class="dv">4</span>]) <span class="sc">|&gt;</span></span>
-<span id="cb6-13"><a href="#cb6-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(id, geometry, height) <span class="sc">|&gt;</span> </span>
-<span id="cb6-14"><a href="#cb6-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">collect</span>() <span class="sc">|&gt;</span></span>
-<span id="cb6-15"><a href="#cb6-15" aria-hidden="true" tabindex="-1"></a>  <span class="fu">st_as_sf</span>(<span class="at">crs =</span> <span class="dv">4326</span>) <span class="sc">|&gt;</span> </span>
-<span id="cb6-16"><a href="#cb6-16" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">height =</span> <span class="fu">ifelse</span>(<span class="fu">is.na</span>(height), <span class="dv">8</span>, height))</span>
-<span id="cb6-17"><a href="#cb6-17" aria-hidden="true" tabindex="-1"></a>sf_buildings <span class="sc">|&gt;</span> <span class="fu">identical</span>(sf_buildings_old)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</div>
-<div class="cell">
-<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="fu">rdeck</span>(<span class="at">map_style =</span> <span class="fu">mapbox_light</span>(), </span>
-<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>      <span class="at">initial_view_state =</span> <span class="fu">view_state</span>(</span>
-<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>        <span class="at">center =</span> <span class="fu">c</span>(<span class="sc">-</span><span class="fl">122.4657</span>, <span class="fl">37.7548</span>),</span>
-<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a>        <span class="at">zoom =</span> <span class="fl">11.3</span>,</span>
-<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a>        <span class="at">bearing =</span> <span class="sc">-</span><span class="dv">60</span>,</span>
-<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a>        <span class="at">pitch =</span> <span class="dv">76</span></span>
-<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a>      )) <span class="sc">|&gt;</span> </span>
-<span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">add_polygon_layer</span>(</span>
-<span id="cb7-9"><a href="#cb7-9" aria-hidden="true" tabindex="-1"></a>    <span class="at">data =</span> sf_buildings, </span>
-<span id="cb7-10"><a href="#cb7-10" aria-hidden="true" tabindex="-1"></a>    <span class="at">name =</span> <span class="st">"San Francisco"</span>,</span>
-<span id="cb7-11"><a href="#cb7-11" aria-hidden="true" tabindex="-1"></a>    <span class="at">get_polygon =</span> geometry, </span>
-<span id="cb7-12"><a href="#cb7-12" aria-hidden="true" tabindex="-1"></a>    <span class="at">get_elevation =</span> height, </span>
-<span id="cb7-13"><a href="#cb7-13" aria-hidden="true" tabindex="-1"></a>    <span class="at">get_fill_color =</span> <span class="fu">scale_color_linear</span>(</span>
-<span id="cb7-14"><a href="#cb7-14" aria-hidden="true" tabindex="-1"></a>      <span class="at">col =</span> height,</span>
-<span id="cb7-15"><a href="#cb7-15" aria-hidden="true" tabindex="-1"></a>      <span class="at">palette =</span> viridisLite<span class="sc">::</span><span class="fu">inferno</span>(<span class="dv">100</span>, <span class="at">direction =</span> <span class="sc">-</span><span class="dv">1</span>)</span>
-<span id="cb7-16"><a href="#cb7-16" aria-hidden="true" tabindex="-1"></a>    ),</span>
-<span id="cb7-17"><a href="#cb7-17" aria-hidden="true" tabindex="-1"></a>    <span class="at">extruded =</span> <span class="cn">TRUE</span>, </span>
-<span id="cb7-18"><a href="#cb7-18" aria-hidden="true" tabindex="-1"></a>    <span class="at">opacity =</span> <span class="fl">0.5</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</div>
-<!-- ## sydney -->
-<!-- ```{r sydney_bbox} -->
-<!-- sydney_bbox <- c(150.787520, -34.088237, 151.422667, -33.643521) -->
-<!-- sydney_buildings <- buildings |> -->
-<!--   filter(bbox$xmin > sydney_bbox[1], -->
-<!--          bbox$ymin > sydney_bbox[2], -->
-<!--          bbox$xmax < sydney_bbox[3], -->
-<!--          bbox$ymax < sydney_bbox[4]) |> -->
+<!-- ## SF -->
+<!-- ```{r counties} -->
+<!-- #| warning: true -->
+<!-- #| message: false -->
+<!-- sf_bbox <- counties(state = "CA", cb = TRUE, resolution = "20m") |>  -->
+<!--   filter(NAME == "San Francisco") |>  -->
+<!--   st_bbox() |>  -->
+<!--   as.vector() -->
+<!-- sf_buildings <-  -->
+<!--   sf_bbox |>  -->
+<!--   get_buildings(buildings) -->
+<!-- sf_buildings_old <- buildings |> -->
+<!--   filter(bbox$xmin > sf_bbox[1], -->
+<!--          bbox$ymin > sf_bbox[2], -->
+<!--          bbox$xmax < sf_bbox[3], -->
+<!--          bbox$ymax < sf_bbox[4]) |> -->
 <!--   select(id, geometry, height) |>  -->
 <!--   collect() |> -->
 <!--   st_as_sf(crs = 4326) |>  -->
-<!--   mutate(height = ifelse(is.na(height), 4, height)) -->
+<!--   mutate(height = ifelse(is.na(height), 8, height)) -->
+<!-- sf_buildings |> identical(sf_buildings_old) -->
 <!-- ``` -->
-<!-- ```{r rdeck sydney} -->
+<!-- ```{r rdeck SF} -->
 <!-- rdeck(map_style = mapbox_light(),  -->
 <!--       initial_view_state = view_state( -->
-<!--         center = c(151.186855, -33.871729), -->
-<!--         zoom = 12, -->
-<!--         bearing = -32.8, -->
-<!--         pitch = 81 -->
+<!--         center = c(-122.4657, 37.7548), -->
+<!--         zoom = 11.3, -->
+<!--         bearing = -60, -->
+<!--         pitch = 76 -->
 <!--       )) |>  -->
 <!--   add_polygon_layer( -->
-<!--     data = sydney_buildings,  -->
-<!--     name = "Sydney", -->
+<!--     data = sf_buildings,  -->
+<!--     name = "San Francisco", -->
 <!--     get_polygon = geometry,  -->
 <!--     get_elevation = height,  -->
 <!--     get_fill_color = scale_color_linear( -->
 <!--       col = height, -->
-<!--       palette = viridisLite::mako(100, direction = -1) -->
+<!--       palette = viridisLite::inferno(100, direction = -1) -->
 <!--     ), -->
 <!--     extruded = TRUE,  -->
 <!--     opacity = 0.5) -->
 <!-- ``` -->
+<!-- <!-- ## sydney -->
+<p>–&gt; <!-- <!-- ```{r sydney_bbox} --> –&gt; <!-- <!-- sydney_bbox <- c(150.787520, -34.088237, 151.422667, -33.643521) --> –&gt;</p>
+<!-- <!-- sydney_buildings <- buildings |> -->
+<p>–&gt; <!-- <!--   filter(bbox$xmin > sydney_bbox[1], --> –&gt; <!-- <!--          bbox$ymin > sydney_bbox[2], --> –&gt; <!-- <!--          bbox$xmax < sydney_bbox[3], --> –&gt; <!-- <!--          bbox$ymax < sydney_bbox[4]) |> --> –&gt; <!-- <!--   select(id, geometry, height) |>  --> –&gt; <!-- <!--   collect() |> --> –&gt; <!-- <!--   st_as_sf(crs = 4326) |>  --> –&gt; <!-- <!--   mutate(height = ifelse(is.na(height), 4, height)) --> –&gt; <!-- <!-- ``` --> –&gt; <!-- <!-- ```{r rdeck sydney} --> –&gt; <!-- <!-- rdeck(map_style = mapbox_light(),  --> –&gt; <!-- <!--       initial_view_state = view_state( --> –&gt; <!-- <!--         center = c(151.186855, -33.871729), --> –&gt; <!-- <!--         zoom = 12, --> –&gt; <!-- <!--         bearing = -32.8, --> –&gt; <!-- <!--         pitch = 81 --> –&gt; <!-- <!--       )) |>  --> –&gt; <!-- <!--   add_polygon_layer( --> –&gt; <!-- <!--     data = sydney_buildings,  --> –&gt; <!-- <!--     name = "Sydney", --> –&gt; <!-- <!--     get_polygon = geometry,  --> –&gt; <!-- <!--     get_elevation = height,  --> –&gt; <!-- <!--     get_fill_color = scale_color_linear( --> –&gt; <!-- <!--       col = height, --> –&gt; <!-- <!--       palette = viridisLite::mako(100, direction = -1) --> –&gt; <!-- <!--     ), --> –&gt; <!-- <!--     extruded = TRUE,  --> –&gt; <!-- <!--     opacity = 0.5) --> –&gt; <!-- <!-- ``` --> –&gt;</p>
 
 
 </section>
