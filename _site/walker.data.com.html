@@ -279,36 +279,8 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <!-- ``` -->
 <!-- <!-- ## sydney -->
 <p>–&gt; <!-- <!-- ```{r sydney_bbox} --> –&gt; <!-- <!-- sydney_bbox <- c(150.787520, -34.088237, 151.422667, -33.643521) --> –&gt;</p>
-<!-- sydney_buildings <- buildings |> -->
-<!--   filter(bbox$xmin > sydney_bbox[1], -->
-<!--          bbox$ymin > sydney_bbox[2], -->
-<!--          bbox$xmax < sydney_bbox[3], -->
-<!--          bbox$ymax < sydney_bbox[4]) |> -->
-<!--   select(id, geometry, height) |>  -->
-<!--   collect() |> -->
-<!--   st_as_sf(crs = 4326) |>  -->
-<!--   mutate(height = ifelse(is.na(height), 4, height)) -->
-<!-- ``` -->
-<!-- ```{r rdeck sydney} -->
-<!-- rdeck(map_style = mapbox_light(),  -->
-<!--       initial_view_state = view_state( -->
-<!--         center = c(151.186855, -33.871729), -->
-<!--         zoom = 12, -->
-<!--         bearing = -32.8, -->
-<!--         pitch = 81 -->
-<!--       )) |>  -->
-<!--   add_polygon_layer( -->
-<!--     data = sydney_buildings,  -->
-<!--     name = "Sydney", -->
-<!--     get_polygon = geometry,  -->
-<!--     get_elevation = height,  -->
-<!--     get_fill_color = scale_color_linear( -->
-<!--       col = height, -->
-<!--       palette = viridisLite::mako(100, direction = -1) -->
-<!--     ), -->
-<!--     extruded = TRUE,  -->
-<!--     opacity = 0.5) -->
-<!-- ``` -->
+<!-- <!-- sydney_buildings <- buildings |> -->
+<p>–&gt; <!-- <!--   filter(bbox$xmin > sydney_bbox[1], --> –&gt; <!-- <!--          bbox$ymin > sydney_bbox[2], --> –&gt; <!-- <!--          bbox$xmax < sydney_bbox[3], --> –&gt; <!-- <!--          bbox$ymax < sydney_bbox[4]) |> --> –&gt; <!-- <!--   select(id, geometry, height) |>  --> –&gt; <!-- <!--   collect() |> --> –&gt; <!-- <!--   st_as_sf(crs = 4326) |>  --> –&gt; <!-- <!--   mutate(height = ifelse(is.na(height), 4, height)) --> –&gt; <!-- <!-- ``` --> –&gt; <!-- <!-- ```{r rdeck sydney} --> –&gt; <!-- <!-- rdeck(map_style = mapbox_light(),  --> –&gt; <!-- <!--       initial_view_state = view_state( --> –&gt; <!-- <!--         center = c(151.186855, -33.871729), --> –&gt; <!-- <!--         zoom = 12, --> –&gt; <!-- <!--         bearing = -32.8, --> –&gt; <!-- <!--         pitch = 81 --> –&gt; <!-- <!--       )) |>  --> –&gt; <!-- <!--   add_polygon_layer( --> –&gt; <!-- <!--     data = sydney_buildings,  --> –&gt; <!-- <!--     name = "Sydney", --> –&gt; <!-- <!--     get_polygon = geometry,  --> –&gt; <!-- <!--     get_elevation = height,  --> –&gt; <!-- <!--     get_fill_color = scale_color_linear( --> –&gt; <!-- <!--       col = height, --> –&gt; <!-- <!--       palette = viridisLite::mako(100, direction = -1) --> –&gt; <!-- <!--     ), --> –&gt; <!-- <!--     extruded = TRUE,  --> –&gt; <!-- <!--     opacity = 0.5) --> –&gt; <!-- <!-- ``` --> –&gt;</p>
 
 
 </section>
